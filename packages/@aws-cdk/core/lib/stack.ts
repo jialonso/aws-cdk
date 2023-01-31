@@ -847,7 +847,7 @@ export class Stack extends Construct implements ITaggable {
    *
    * stack.addTransform('AWS::Serverless-2016-10-31')
    */
-  public addTransform(transform: string) {
+  public addTransform(transform: string | ITemplateTransform) {
     if (!this.templateOptions.transforms) {
       this.templateOptions.transforms = [];
     }
@@ -1288,7 +1288,7 @@ export class Stack extends Construct implements ITaggable {
    * @internal
    */
   protected _toCloudFormation() {
-    let transform: string | string[] | undefined;
+    let transform: string | ITemplateTransform | (string | ITemplateTransform)[] | undefined ;
 
     if (this.templateOptions.transform) {
       // eslint-disable-next-line max-len
@@ -1552,6 +1552,21 @@ function mergeObjectsWithoutDuplicates(section: string, dest: any, src: any): an
 }
 
 /**
+ * Template Transform options.
+ */
+export interface ITemplateTransform {
+  /**
+   * Name of the transform macro
+   */
+  Name: string;
+
+  /**
+   * Paramaters that are passed to the transform macro
+   */
+  Parameters?: { [key: string]: any }
+}
+
+/**
  * CloudFormation template options for a stack.
  */
 export interface ITemplateOptions {
@@ -1576,7 +1591,7 @@ export interface ITemplateOptions {
   /**
    * Gets or sets the top-level template transform(s) for this stack (e.g. `["AWS::Serverless-2016-10-31"]`).
    */
-  transforms?: string[];
+  transforms?: (string | ITemplateTransform)[];
 
   /**
    * Metadata associated with the CloudFormation template.
